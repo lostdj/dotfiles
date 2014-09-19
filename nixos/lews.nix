@@ -1,3 +1,5 @@
+# ThinkPad W520.
+
 { config, pkgs, lib, ... }:
 
 with builtins;
@@ -82,12 +84,9 @@ let
 
 		boot =
 		{
-			loader =
+			loader.grub =
 			{
-				grub =
-				{
-					#extraConfig = "insmod zfs";
-				};
+				#extraConfig = "insmod zfs";
 			};
 
 			kernelModules =
@@ -101,7 +100,7 @@ let
 			spl.hostid = "0xdeadbabe";
 
 			extraModprobeConfig =
-			# TODO: Not working? Place cmds in postBootCommands?
+			# TODO: Not working? Put this in postBootCommands?
 			/*''
 				options zfs zfs_arc_min=33554432
 				options zfs zfs_arc_max=536870912
@@ -304,7 +303,7 @@ let
 	{
 		environment.variables =
 		{
-			HISTFILESIZE = [ "5000" ];
+			HISTFILESIZE = [ "9000" ];
 
 			PATH =
 			[
@@ -335,7 +334,6 @@ let
 
 	# ----------------------------------------
 	{
-		# TODO:
 		# `mkpasswd -m sha-512`
 		security.initialRootPassword = privy.users.root.passwd;
 
@@ -423,8 +421,8 @@ let
 			alsaUtils
 			alsaOss
 			phonon
-			phonon_backend_gstreamer
 			phonon_backend_vlc
+			phonon_backend_gstreamer
 		];
 
 		sound.enable = true;
@@ -548,6 +546,7 @@ let
 			[X-*-Core]
 			AllowRootLogin = true
 		";
+
 		services.xserver.desktopManager.kde4.enable = true;
 	}
 
@@ -559,11 +558,6 @@ let
 			openssh
 		];
 
-		programs =
-		{
-			ssh.forwardX11 = true;
-		};
-
 		services =
 		{
 			openssh =
@@ -571,6 +565,11 @@ let
 				enable = false;
 				permitRootLogin = "yes";
 			};
+		};
+
+		programs =
+		{
+			ssh.forwardX11 = true;
 		};
 	}
 
@@ -582,12 +581,9 @@ let
 			samba
 		];
 
-		services =
+		services.samba =
 		{
-			samba =
-			{
-				enable = false;
-			};
+			enable = false;
 		};
 
 		fileSystems = privy.cifs.shares.kiwi;
@@ -612,17 +608,14 @@ let
 			nano
 		];
 
-		programs =
-		{
-			nano.nanorc =
-			"
-				set fill 0
-				set softwrap
-				set nowrap
-				set smooth
-				set tabsize 2
-			";
-		};
+		programs.nano.nanorc =
+		"
+			set fill 0
+			set softwrap
+			set nowrap
+			set smooth
+			set tabsize 2
+		";
 	}
 
 
@@ -653,6 +646,34 @@ let
 		''
 			127.0.0.1					sublimetext.com
 			127.0.0.1					www.sublimetext.com
+		'';
+	}
+
+
+	# ----------------------------------------
+	{
+		environment.systemPackages = with pkgs;
+		[
+			bittorrentSync
+		];
+
+		services.btsync =
+		{
+			enable = true;
+			deviceName = "lews";
+			checkForUpdates = false;
+			useUpnp = false;
+			enableWebUI = true;
+			httpListenAddr = "127.0.0.1";
+			httpListenPort = 9000;
+			httpLogin = privy.btsync.login;
+			httpPass = privy.btsync.passwd;
+			encryptLAN = true;
+		};
+
+		networking.extraHosts =
+		''
+			127.0.0.1					btsync.lews
 		'';
 	}
 
@@ -708,8 +729,8 @@ let
 			jnettop
 			iotop
 
-			mc
 			mkpasswd
+			mc
 			curl
 			wget
 			unzip
@@ -758,13 +779,12 @@ let
 			nixpkgs.config.packageOverrides = origPkgs:
 				let
 					pkgMapper = { rest, origPkgs }:
-						# Meh...
-						if (rest != []) then
-							if ((head rest) == []) then
-								(pkgMapper { rest = (tail rest); origPkgs = origPkgs; })
+						if rest != [] then
+							if (head rest) == [] then
+								pkgMapper { rest = tail rest; origPkgs = origPkgs; }
 							else
 								((head (head rest)) origPkgs)
-								// (pkgMapper { rest = (tail rest); origPkgs = origPkgs; })
+								// pkgMapper { rest = tail rest; origPkgs = origPkgs; }
 						else
 							{};
 				in
