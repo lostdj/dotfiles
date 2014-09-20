@@ -225,18 +225,6 @@ let
 				fsType = "tmpfs";
 				options = "size=10g, mode=1777";
 			};
-
-			"/opt/nixpkgs" =
-			{
-				device = "zplews/usr/nixos/nixpkgs";
-				fsType = "zfs";
-			};
-
-			"/opt/nixpkgs/stable" =
-			{
-				device = "zplews/usr/nixos/nixpkgs/stable";
-				fsType = "zfs";
-			};
 		};
 	}
 
@@ -295,6 +283,33 @@ let
 			grub.copyKernels = true;
 
 			generationsDir.copyKernels = true;
+		};
+
+		fileSystems =
+		{
+			"/opt/nixpkgs" =
+			{
+				device = "zplews/usr/nixos/nixpkgs";
+				fsType = "zfs";
+			};
+
+			"/opt/nixpkgs/stable" =
+			{
+				device = "zplews/usr/nixos/nixpkgs/stable";
+				fsType = "zfs";
+			};
+		
+			"/opt/nixpkgs/master" =
+			{
+				device = "zplews/usr/nixos/nixpkgs/master";
+				fsType = "zfs";
+			};
+
+			"/opt/nixpkgs/master-upstream" =
+			{
+				device = "zplews/usr/nixos/nixpkgs/master-upstream";
+				fsType = "zfs";
+			};
 		};
 	}
 
@@ -466,28 +481,73 @@ let
 
 	# ----------------------------------------
 	{
-		environment.systemPackages = with pkgs;
-		[
-			#wrapFonts
-			andagii anonymousPro /*arkpandora_ttf Failed to connect to www.users.bigpond.net.au*/ aurulent-sans
-			bakoma_ttf cantarell_fonts clearlyU cm_unicode
-			comic-neue corefonts dejavu_fonts dosemu_fonts
-			eb-garamond fira freefont_ttf gentium
-			inconsolata ipafont junicode kochi-substitute-naga10
-			kochi-substitute libertine lmodern lohit-fonts
-			mph_2b_damase nafees oldstandard opensans-ttf
-			poly liberation_ttf source-code-pro
-			source-sans-pro source-serif-pro
-			source-han-sans-japanese
-			source-han-sans-korean
-			source-han-sans-simplified-chinese
-			source-han-sans-traditional-chinese
-			/*symbola wrong hash*/ tempora_lgc terminus_font theano tipa
-			ttf_bitstream_vera ubuntu_font_family ucsFonts
-			unifont vistafonts wqy_microhei wqy_zenhei
-		];
+		# fc-cache --really-force --verbose
 
-		# TODO:
+		fonts =
+		{
+			enableFontDir = true;
+			enableFontConfig = true;
+			enableGhostscriptFonts = true;
+			enableCoreFonts = true;
+			fonts = with pkgs;
+			[
+				#wrapFonts
+				andagii
+				anonymousPro
+				#arkpandora_ttf Failed to connect to www.users.bigpond.net.au
+				aurulent-sans
+				bakoma_ttf
+				cantarell_fonts
+				clearlyU
+				cm_unicode
+				comic-neue
+				dejavu_fonts
+				dosemu_fonts
+				eb-garamond
+				fira
+				freefont_ttf
+				gentium
+				inconsolata
+				ipafont
+				junicode
+				kochi-substitute-naga10
+				kochi-substitute
+				libertine
+				lmodern
+				lohit-fonts
+				mph_2b_damase
+				nafees
+				oldstandard
+				opensans-ttf
+				poly
+				liberation_ttf
+				source-code-pro
+				source-sans-pro
+				source-serif-pro
+				source-han-sans-japanese
+				source-han-sans-korean
+				source-han-sans-simplified-chinese
+				source-han-sans-traditional-chinese
+				#symbola wrong hash
+				tempora_lgc
+				terminus_font
+				theano
+				tipa
+				ttf_bitstream_vera
+				ubuntu_font_family
+				ucsFonts
+				unifont
+				vistafonts
+				wqy_microhei
+				wqy_zenhei
+				xorg.fontbhttf
+				xorg.fontbhlucidatypewriter100dpi
+				xorg.fontbhlucidatypewriter75dpi
+				xorg.fontbh100dpi
+				xorg.fontmiscmisc
+				xorg.fontcursormisc
+			];
+		};
 	}
 
 
@@ -682,6 +742,38 @@ let
 	{
 		environment.systemPackages = with pkgs;
 		[
+			pgadmin
+			mysqlWorkbench
+		];
+	}
+
+
+	# ----------------------------------------
+	{
+		my.pkgOverrides =
+		[(p: rec {
+			postgresql = p.postgresql93;
+		})];
+
+		environment.systemPackages = with pkgs;
+		[
+			postgresql
+		];
+
+		services.postgresql =
+		{
+			enable = true;
+			package = pkgs.postgresql;
+			dataDir = "/mnt/zfs/levault/local/pg";
+			enableTCPIP = false;
+		};
+	}
+
+
+	# ----------------------------------------
+	{
+		environment.systemPackages = with pkgs;
+		[
 			git
 			subversion
 			mercurial
@@ -744,25 +836,6 @@ let
 			thunderbird
 		];
 	}
-
-
-	# ----------------------------------------
-	{
-		fileSystems =
-		{
-			"/opt/nixpkgs/master" =
-			{
-				device = "zplews/usr/nixos/nixpkgs/master";
-				fsType = "zfs";
-			};
-
-			"/opt/nixpkgs/master-upstream" =
-			{
-				device = "zplews/usr/nixos/nixpkgs/master-upstream";
-				fsType = "zfs";
-			};
-		};
-	}
 	]; # /mkMerge cfg
 
 
@@ -792,7 +865,14 @@ let
 					pkgMapper
 					{
 						rest =
-							map (co: if (hasAttr "my" co && hasAttr "pkgOverrides" co.my) then co.my.pkgOverrides else []) cfg.contents;
+							map
+							(co:
+								if (hasAttr "my" co && hasAttr "pkgOverrides" co.my) then
+									co.my.pkgOverrides
+								else
+									[]
+							)
+							cfg.contents;
 						origPkgs = origPkgs;
 					};
 		}]
