@@ -31,11 +31,11 @@
 
 		//,"gray_antialias"
 		//,"no_antialias"
-		,"subpixel_antialias"
+		//,"subpixel_antialias"
 	]
 	//,"font_face": "Droid Sans Mono"
-	,"font_face": "Bitstream Vera Sans Mono"
-	,"font_size": 9
+	,"font_face": "Anonymous Pro"
+	,"font_size": 10
 	,"gutter": true
 	,"highlight_line": true
 	,"highlight_modified_tabs": true

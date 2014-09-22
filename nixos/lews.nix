@@ -332,7 +332,7 @@ let
 				"nixos-config=/etc/nixos/configuration.nix"
 				#"/nix/var/nix/profiles/per-user/root/channels/nixos"
 			];
-		};	
+		};
 	}
 
 
@@ -483,6 +483,22 @@ let
 	{
 		# fc-cache --really-force --verbose
 
+		my.pkgOverrides =
+		[(p: rec {
+			freetype = p.freetype.override { useEncumberedCode = true; };
+		})];
+
+		environment.systemPackages = with pkgs;
+		[
+			freetype
+
+			fontconfig
+			xorg.fontsproto
+			xorg.fontutil
+		];
+
+		environment.sessionVariables.LD_LIBRARY_PATH = [ "${pkgs.freetype}/lib" ];
+
 		fonts =
 		{
 			enableFontDir = true;
@@ -540,12 +556,28 @@ let
 				vistafonts
 				wqy_microhei
 				wqy_zenhei
-				xorg.fontbhttf
+				xorg.fontadobe100dpi
+				xorg.fontadobe75dpi
+				xorg.fontadobeutopia100dpi
+				xorg.fontadobeutopia75dpi
+				xorg.fontadobeutopiatype1
 				xorg.fontbhlucidatypewriter100dpi
 				xorg.fontbhlucidatypewriter75dpi
+				xorg.fontbhttf
 				xorg.fontbh100dpi
+				xorg.fontbh75dpi
 				xorg.fontmiscmisc
 				xorg.fontcursormisc
+				xorg.fontcronyxcyrillic
+				xorg.fontdaewoomisc
+				xorg.fontmisccyrillic
+				xorg.fontmiscethiopic
+				xorg.fontisasmisc
+				xorg.fontjismisc
+				xorg.fontsonymisc
+				xorg.fontsunmisc
+				xorg.fontwinitzkicyrillic
+				xorg.fontxfree86type1
 			];
 		};
 	}
@@ -560,43 +592,43 @@ let
 
 		environment.systemPackages = with pkgs;
 		[
-			pkgs.kde4.kdeaccessibility
-			pkgs.kde4.kdeadmin
-			pkgs.kde4.kdeartwork
-			pkgs.kde4.kdebindings
-			pkgs.kde4.kdegraphics
-			pkgs.kde4.kdemultimedia
-			pkgs.kde4.kdenetwork
-			pkgs.kde4.kdesdk
-			pkgs.kde4.kdeutils
-			pkgs.kde4.kdewebdev
-			pkgs.kde4.amarok.all
-			pkgs.kde4.calligra.all
-			pkgs.kde4.colord-kde.all
-			pkgs.kde4.digikam.all
-			pkgs.kde4.k3b.all
-			pkgs.kde4.kadu.all
-			pkgs.kde4.kde_gtk_config.all
-			pkgs.kde4.kde_wacomtablet.all
-			pkgs.kde4.kdeconnect.all
-			pkgs.kde4.kdenlive.all
-			pkgs.kde4.kdesvn.all
-			pkgs.kde4.kdevelop.all
-			pkgs.kde4.kdevplatform.all
-			pkgs.kde4.kdiff3.all
-			pkgs.kde4.kile.all
-			pkgs.kde4.kmplayer.all
-			pkgs.kde4.kmymoney.all
-			pkgs.kde4.konversation.all
-			pkgs.kde4.kvirc.all
-			pkgs.kde4.krename.all
-			pkgs.kde4.krusader.all
-			pkgs.kde4.ktorrent.all
-			pkgs.kde4.kuickshow.all
-			pkgs.kde4.networkmanagement.all
-			pkgs.kde4.psi.all
-			#pkgs.kde4.rekonq.all # Screws with everything.
-			#pkgs.kde4.telepathy.full
+			kde4.kdeaccessibility
+			kde4.kdeadmin
+			kde4.kdeartwork
+			kde4.kdebindings
+			kde4.kdegraphics
+			kde4.kdemultimedia
+			kde4.kdenetwork
+			kde4.kdesdk
+			kde4.kdeutils
+			kde4.kdewebdev
+			kde4.amarok.all
+			kde4.calligra.all
+			kde4.colord-kde.all
+			kde4.digikam.all
+			kde4.k3b.all
+			kde4.kadu.all
+			kde4.kde_gtk_config.all
+			kde4.kde_wacomtablet.all
+			kde4.kdeconnect.all
+			kde4.kdenlive.all
+			kde4.kdesvn.all
+			kde4.kdevelop.all
+			kde4.kdevplatform.all
+			kde4.kdiff3.all
+			kde4.kile.all
+			kde4.kmplayer.all
+			kde4.kmymoney.all
+			kde4.konversation.all
+			kde4.kvirc.all
+			kde4.krename.all
+			kde4.krusader.all
+			kde4.ktorrent.all
+			kde4.kuickshow.all
+			kde4.networkmanagement.all
+			kde4.psi.all
+			#kde4.rekonq.all # Screws with everything.
+			#kde4.telepathy.full
 			#oxygen_gtk.all # Screws with Palemoon.
 		];
 
