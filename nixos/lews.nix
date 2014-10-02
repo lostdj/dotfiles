@@ -261,6 +261,8 @@ let
 
 		nixpkgs.config.allowUnfree = true;
 
+		services.nixosManual.enable = false;
+
 		nix =
 		{
 			maxJobs = pkgs.lib.mkOverride 0 2;
@@ -792,12 +794,18 @@ let
 			postgresql
 		];
 
+		users.extraUsers.postgres.hashedPassword = privy.users.postgres.passwd;
+
 		services.postgresql =
 		{
 			enable = true;
 			package = pkgs.postgresql;
 			dataDir = "/mnt/zfs/levault/local/pg";
 			enableTCPIP = false;
+			authentication =
+			''
+				local all postgres ident
+			'';
 		};
 	}
 
@@ -825,6 +833,7 @@ let
 		my.pkgOverrides =
 		[(p: rec {
 			jdk = p.oraclejdk7;
+			jdkdistro = p.oraclejdk7distro;
 			#jre = p.oraclejre7;
 			jre = jdk;
 
@@ -839,6 +848,47 @@ let
 			ant
 
 			ideas.idea-community
+		];
+	}
+
+
+	# ----------------------------------------
+	{
+		my.pkgOverrides =
+		[(p: rec {
+			wine = p.wineUnstable;
+			winetricks = p.winetricks.override { wine = p.wineUnstable; };
+		})];
+
+		environment.systemPackages = with pkgs;
+		[
+			wine
+			winetricks # `winetricks atmlib gdiplus msxml3 msxml6 vcrun2005 vcrun2005sp1 vcrun2008 ie6 fontsmooth-rgb gecko`
+		];
+	}
+
+
+	# ----------------------------------------
+	{
+		nixpkgs.config.firefox.enableAdobeFlash = true;
+		#nixpkgs.config.firefox.enableVlc = true;
+		nixpkgs.config.firefox.enableDjvu = true;
+		nixpkgs.config.firefox.jre = true;
+
+		nixpkgs.config.chromium.enablePepperFlash = true;
+		nixpkgs.config.chromium.enablePepperPDF = true;
+
+		my.pkgOverrides =
+		[(p: rec {
+			#firefox = p.firefoxWrapper; # Infinite rec.
+		})];
+
+
+		environment.systemPackages = with pkgs;
+		[
+			firefoxWrapper
+
+			#chromiumBeta
 		];
 	}
 
