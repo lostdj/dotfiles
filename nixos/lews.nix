@@ -203,7 +203,21 @@ let
 
 	# ----------------------------------------
 	{
-		swapDevices = [ ];
+		zramSwap =
+		{
+			enable = true;
+			memoryPercent = 50;
+			numDevices = 4;
+			priority = 5;
+		};
+
+		swapDevices =
+		[
+			{ device = "/dev/zram0"; }
+			{ device = "/dev/zram1"; }
+			{ device = "/dev/zram2"; }
+			{ device = "/dev/zram3"; }
+		];
 
 		fileSystems =
 		{
@@ -220,6 +234,13 @@ let
 			};
 
 			"/tmp" =
+			{
+				device = "tmpfs";
+				fsType = "tmpfs";
+				options = "size=10g, mode=1777";
+			};
+
+			"/letmp" =
 			{
 				device = "tmpfs";
 				fsType = "tmpfs";
@@ -261,7 +282,7 @@ let
 
 		nixpkgs.config.allowUnfree = true;
 
-		services.nixosManual.enable = false;
+		#services.nixosManual.enable = false;
 
 		nix =
 		{
@@ -329,9 +350,9 @@ let
 
 			NIX_PATH = pkgs.lib.mkOverride 0
 			[
-				"/opt/nixpkgs/stable"
 				"nixpkgs=/opt/nixpkgs/stable"
 				"nixos-config=/etc/nixos/configuration.nix"
+				"/opt/nixpkgs/stable"
 				#"/nix/var/nix/profiles/per-user/root/channels/nixos"
 			];
 		};
@@ -348,6 +369,7 @@ let
 			fsType = "zfs";
 		};
 	}
+
 
 	# ----------------------------------------
 	{
@@ -462,11 +484,15 @@ let
 		''
 			Option "RegistryDwords" "EnableBrightnessControl=1"
 		'';
-
 		services.xserver.videoDrivers = [ "nvidia" ];
 		hardware.opengl.enable = true;
 		hardware.opengl.driSupport = true;
 		hardware.opengl.driSupport32Bit = true;
+
+		services.xserver.serverFlagsSection =
+		''
+			Option "DontZap" "yes"
+		'';
 	}
 
 
@@ -589,7 +615,7 @@ let
 	{
 		my.pkgOverrides =
 		[(p: rec {
-			kde4 = p.kde412;
+			kde4 = p.kde414;
 		})];
 
 		environment.systemPackages = with pkgs;
@@ -734,6 +760,8 @@ let
 		environment.systemPackages = with pkgs;
 		[
 			sublime3
+
+			ctags
 		];
 
 		networking.extraHosts =
@@ -794,11 +822,11 @@ let
 			postgresql
 		];
 
-		users.extraUsers.postgres.hashedPassword = privy.users.postgres.passwd;
+		#users.extraUsers.postgres.hashedPassword = privy.users.postgres.passwd;
 
 		services.postgresql =
 		{
-			enable = true;
+			enable = false;
 			package = pkgs.postgresql;
 			dataDir = "/mnt/zfs/levault/local/pg";
 			enableTCPIP = false;
@@ -814,16 +842,19 @@ let
 	{
 		environment.systemPackages = with pkgs;
 		[
+			gdb
+
 			git
 			subversion
 			mercurial
-
 			smartgithg
 
 			cmake
 
 			SDL
 			openal
+
+			qtcreator
 		];
 	}
 
@@ -832,12 +863,16 @@ let
 	{
 		my.pkgOverrides =
 		[(p: rec {
-			jdk = p.oraclejdk7;
 			jdkdistro = p.oraclejdk7distro;
-			#jre = p.oraclejre7;
+			jdk = p.oraclejdk7;
 			jre = jdk;
+			oraclejre = jdk;
+			oraclejre7 = jdk;
 
 			ant = p.apacheAnt;
+
+			gradle = p.gradle.override { jdk = p.oraclejdk8; };
+			gradle18 = p.gradle18.override { jdk = p.oraclejdk8; };
 		})];
 
 		environment.systemPackages = with pkgs;
@@ -845,9 +880,9 @@ let
 			jdk
 			#jre
 
-			ant
+			#ant
 
-			ideas.idea-community
+			idea.idea-community
 		];
 	}
 
@@ -903,11 +938,17 @@ let
 			jnettop
 			iotop
 
+			coreutils
+			which
 			mkpasswd
 			mc
 			curl
 			wget
+			zip
 			unzip
+			p7zip
+			unrar
+			nix-prefetch-scripts
 
 			python2
 
@@ -916,6 +957,10 @@ let
 
 			firefox
 			thunderbird
+
+			bitcoin
+
+			fontforgeX
 		];
 	}
 	]; # /mkMerge cfg
