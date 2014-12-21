@@ -96,8 +96,6 @@ let
 			];
 
 			supportedFilesystems = [ "zfs" ];
-			
-			spl.hostid = "0xdeadbabe";
 
 			extraModprobeConfig =
 			# TODO: Not working? Put this in postBootCommands?
@@ -108,6 +106,9 @@ let
 			''*/
 			'''';
 		};
+
+		# head -c4 /dev/urandom | od -A none -t x4
+		networking.hostId = "deadbabe";
 	}
 
 
@@ -206,7 +207,7 @@ let
 		zramSwap =
 		{
 			enable = true;
-			memoryPercent = 50;
+			memoryPercent = 65;
 			numDevices = 4;
 			priority = 5;
 		};
