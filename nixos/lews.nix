@@ -245,9 +245,21 @@ let
 			{
 				device = "tmpfs";
 				fsType = "tmpfs";
-				options = "size=10g, mode=1777";
+				options = "size=14g, mode=1777";
 			};
 		};
+	}
+
+
+	# ----------------------------------------
+	{
+		services.udev.extraRules =
+		''
+KERNEL=="uinput", MODE="0666"
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="054c", ATTRS{idProduct}=="05c4", MODE="0666"
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0005:054C:05C4.*", MODE="0666"
+KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0003:054C:05C4.*", MODE="0666"
+		'';
 	}
 
 
@@ -287,7 +299,7 @@ let
 
 		nix =
 		{
-			maxJobs = pkgs.lib.mkOverride 0 2;
+			maxJobs = pkgs.lib.mkOverride 0 1;
 
 			binaryCaches = pkgs.lib.mkOverride 0
 			[
@@ -453,6 +465,24 @@ let
 
 	# ----------------------------------------
 	{
+		my.pkgOverrides =
+		[(p: rec {
+			bluez = pkgs.bluez5;
+		})];
+
+		environment.systemPackages = with pkgs;
+		[
+			bluez
+			kde4.bluedevil
+			#blueman
+		];
+
+		hardware.bluetooth.enable = true;
+	}
+
+
+	# ----------------------------------------
+	{
 		environment.systemPackages = with pkgs;
 		[
 			pulseaudioFull
@@ -463,6 +493,7 @@ let
 			phonon
 			phonon_backend_vlc
 			phonon_backend_gstreamer
+			pavucontrol
 		];
 
 		sound.enable = true;
@@ -531,7 +562,7 @@ let
 		fonts =
 		{
 			enableFontDir = true;
-			enableFontConfig = true;
+			fontconfig.enable = true;
 			enableGhostscriptFonts = true;
 			enableCoreFonts = true;
 			fonts = with pkgs;
@@ -630,32 +661,32 @@ let
 			kde4.kdenetwork
 			kde4.kdesdk
 			kde4.kdeutils
-			kde4.kdewebdev
-			kde4.amarok.all
+			#kde4.kdewebdev
+			#kde4.amarok.all
 			kde4.calligra.all
 			kde4.colord-kde.all
 			kde4.digikam.all
 			kde4.k3b.all
 			kde4.kadu.all
 			kde4.kde_gtk_config.all
-			kde4.kde_wacomtablet.all
-			kde4.kdeconnect.all
-			kde4.kdenlive.all
-			kde4.kdesvn.all
-			kde4.kdevelop.all
+			#kde4.kde_wacomtablet.all
+			#kde4.kdeconnect.all
+			#kde4.kdenlive.all
+			#kde4.kdesvn.all
+			#kde4.kdevelop.all
 			kde4.kdevplatform.all
 			kde4.kdiff3.all
 			kde4.kile.all
-			kde4.kmplayer.all
-			kde4.kmymoney.all
+			#kde4.kmplayer.all
+			#kde4.kmymoney.all
 			kde4.konversation.all
-			kde4.kvirc.all
+			#kde4.kvirc.all
 			kde4.krename.all
 			kde4.krusader.all
 			kde4.ktorrent.all
 			kde4.kuickshow.all
 			kde4.networkmanagement.all
-			kde4.psi.all
+			#kde4.psi.all
 			#kde4.rekonq.all # Screws with everything.
 			#kde4.telepathy.full
 			#oxygen_gtk.all # Screws with Palemoon.
@@ -683,7 +714,7 @@ let
 		{
 			openssh =
 			{
-				enable = false;
+				enable = true;
 				permitRootLogin = "yes";
 			};
 		};
@@ -792,6 +823,7 @@ let
 			httpLogin = privy.btsync.login;
 			httpPass = privy.btsync.passwd;
 			encryptLAN = true;
+			storagePath = "/mnt/zfs/levault/local/btsync/";
 		};
 
 		networking.extraHosts =
@@ -806,7 +838,8 @@ let
 		environment.systemPackages = with pkgs;
 		[
 			pgadmin
-			mysqlWorkbench
+			#mysqlWorkbench #/nix/store/kjny2f5spqf3xqhzlp0bg28n4mamm3bb-mysql-workbench-5.2.47/bin/mysql-workbench
+			sqlitebrowser
 		];
 	}
 
@@ -843,12 +876,23 @@ let
 	{
 		environment.systemPackages = with pkgs;
 		[
+			sqlite-interactive
+		];
+	}
+
+
+	# ----------------------------------------
+	{
+		environment.systemPackages = with pkgs;
+		[
 			gdb
 
-			git
+			#git
+			gitFull
 			subversion
 			mercurial
 			smartgithg
+			fossil
 
 			cmake
 
@@ -864,11 +908,13 @@ let
 	{
 		my.pkgOverrides =
 		[(p: rec {
-			jdkdistro = p.oraclejdk7distro;
-			jdk = p.oraclejdk7;
+			jdkdistro = p.oraclejdk8distro;
+			jdk = p.oraclejdk8;
 			jre = jdk;
+			oraclejdk = jdk;
+			oraclejdk8 = jdk;
 			oraclejre = jdk;
-			oraclejre7 = jdk;
+			oraclejre8 = jdk;
 
 			ant = p.apacheAnt;
 
@@ -933,7 +979,44 @@ let
 	{
 		environment.systemPackages = with pkgs;
 		[
+			vlc
+			mpv
+		];
+
+		nixpkgs.config.mpv =
+		{
+			bs2bSupport = true;
+			youtubeSupport = true;
+			cacaSupport = true;
+			vaapiSupport = true;
+		};
+	}
+
+
+	# ----------------------------------------
+	{
+		my.pkgOverrides =
+		[(p: rec {
+			#PPSSPP = p.PPSSPP.override { withGamepads = true; };
+		})];
+
+		environment.systemPackages = with pkgs;
+		[
+			linuxConsoleTools
+			qjoypad
+			#PPSSPP
+			dolphinEmuMaster
+			steam
+		];
+	}
+
+
+	# ----------------------------------------
+	{
+		environment.systemPackages = with pkgs;
+		[
 			gptfdisk
+			dmidecode
 
 			htop
 			jnettop
@@ -950,18 +1033,21 @@ let
 			p7zip
 			unrar
 			nix-prefetch-scripts
+			lsof
 
 			python2
 
-			vlc
 			viewnior
+			imagemagick
 
-			firefox
+			#firefox
 			thunderbird
 
-			bitcoin
+			freerdp
 
-			fontforgeX
+			#bitcoin
+
+			#fontforgeX
 		];
 	}
 	]; # /mkMerge cfg
