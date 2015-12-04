@@ -299,7 +299,7 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0003:054C:05C4.*", MODE="0666"
 
 		nix =
 		{
-			maxJobs = pkgs.lib.mkOverride 0 1;
+			maxJobs = pkgs.lib.mkOverride 0 2;
 
 			binaryCaches = pkgs.lib.mkOverride 0
 			[
@@ -581,6 +581,8 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0003:054C:05C4.*", MODE="0666"
 				dosemu_fonts
 				eb-garamond
 				fira
+				fira-code
+				fira-mono
 				freefont_ttf
 				gentium
 				inconsolata
@@ -590,7 +592,7 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0003:054C:05C4.*", MODE="0666"
 				kochi-substitute
 				libertine
 				lmodern
-				lohit-fonts
+				#lohit-fonts # It was split into several pkgs. Does not work anymore. Not interested, bye!
 				mph_2b_damase
 				nafees
 				oldstandard
@@ -616,6 +618,7 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0003:054C:05C4.*", MODE="0666"
 				vistafonts
 				wqy_microhei
 				wqy_zenhei
+				google-fonts
 				xorg.fontadobe100dpi
 				xorg.fontadobe75dpi
 				xorg.fontadobeutopia100dpi
@@ -659,33 +662,33 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0003:054C:05C4.*", MODE="0666"
 			kde4.kdegraphics
 			kde4.kdemultimedia
 			kde4.kdenetwork
-			kde4.kdesdk
+			#kde4.kdesdk
 			kde4.kdeutils
 			#kde4.kdewebdev
 			#kde4.amarok.all
-			kde4.calligra.all
-			kde4.colord-kde.all
-			kde4.digikam.all
-			kde4.k3b.all
-			kde4.kadu.all
-			kde4.kde_gtk_config.all
+			#kde4.calligra.all
+			#kde4.colord-kde.all
+			kde4.digikam
+			kde4.k3b
+			#kde4.kadu.all
+			#kde4.kde_gtk_config.all
 			#kde4.kde_wacomtablet.all
 			#kde4.kdeconnect.all
 			#kde4.kdenlive.all
 			#kde4.kdesvn.all
 			#kde4.kdevelop.all
-			kde4.kdevplatform.all
-			kde4.kdiff3.all
-			kde4.kile.all
+			#kde4.kdevplatform.all
+			#kde4.kdiff3.all
+			#kde4.kile.all
 			#kde4.kmplayer.all
 			#kde4.kmymoney.all
-			kde4.konversation.all
+			kde4.konversation
 			#kde4.kvirc.all
-			kde4.krename.all
-			kde4.krusader.all
-			kde4.ktorrent.all
-			kde4.kuickshow.all
-			kde4.networkmanagement.all
+			#kde4.krename.all
+			kde4.krusader
+			kde4.ktorrent
+			kde4.kuickshow
+			#kde4.networkmanagement.all
 			#kde4.psi.all
 			#kde4.rekonq.all # Screws with everything.
 			#kde4.telepathy.full
@@ -1093,4 +1096,3 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0003:054C:05C4.*", MODE="0666"
 	);
 in
 	cfg_
-
