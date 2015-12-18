@@ -369,6 +369,14 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0003:054C:05C4.*", MODE="0666"
 				#"/nix/var/nix/profiles/per-user/root/channels/nixos"
 			];
 		};
+
+		/*nix.nixPath = pkgs.lib.mkOverride 0
+		[
+			"nixpkgs=/opt/nixpkgs/stable"
+			"nixos-config=/etc/nixos/configuration.nix"
+			"/opt/nixpkgs/stable"
+			#"/nix/var/nix/profiles/per-user/root/channels/nixos"
+		];*/
 	}
 
 
@@ -485,6 +493,9 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0003:054C:05C4.*", MODE="0666"
 	{
 		environment.systemPackages = with pkgs;
 		[
+			jack2Full
+			#qjackctl
+
 			pulseaudioFull
 			alsaLib
 			alsaPlugins
@@ -494,6 +505,8 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0003:054C:05C4.*", MODE="0666"
 			phonon_backend_vlc
 			phonon_backend_gstreamer
 			pavucontrol
+
+			#sonic-pi
 		];
 
 		sound.enable = true;
@@ -816,7 +829,7 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0003:054C:05C4.*", MODE="0666"
 
 		services.btsync =
 		{
-			enable = true;
+			enable = false;
 			deviceName = "lews";
 			checkForUpdates = false;
 			useUpnp = false;
@@ -983,7 +996,8 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0003:054C:05C4.*", MODE="0666"
 		environment.systemPackages = with pkgs;
 		[
 			vlc
-			mpv
+			#mpv
+			ffmpeg-full
 		];
 
 		nixpkgs.config.mpv =
@@ -1005,11 +1019,18 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0003:054C:05C4.*", MODE="0666"
 
 		environment.systemPackages = with pkgs;
 		[
-			linuxConsoleTools
+			#linuxConsoleTools
 			qjoypad
 			#PPSSPP
-			dolphinEmuMaster
+			#dolphinEmuMaster
 			steam
+			/*
+			trying http://repo.steampowered.com/steamrt/pool/main/libx/libxrender/libxrender1_0.9.6-2ubuntu0.1+srt4_amd64.deb
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0curl: (22) The requested URL returned error: 404 Not Found
+error: cannot download libxrender1.deb from any mirror
+			*/
 		];
 	}
 
@@ -1038,7 +1059,7 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0003:054C:05C4.*", MODE="0666"
 			nix-prefetch-scripts
 			lsof
 
-			python2
+			#python2
 
 			viewnior
 			imagemagick
@@ -1047,6 +1068,8 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0003:054C:05C4.*", MODE="0666"
 			thunderbird
 
 			freerdp
+
+			wireshark-gtk
 
 			#bitcoin
 
