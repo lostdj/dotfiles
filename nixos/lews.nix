@@ -44,6 +44,8 @@ let
 				"firewire_ohci"
 				"xhci_hcd"
 				"usb_storage"
+				"snd-seq"
+				"snd-rawmidi"
 			];
 
 			luks =
@@ -51,7 +53,7 @@ let
 				cryptoModules =
 				[
 					"aes"
-					"aes_generic"
+					"aes_generic" # TODO: modprobe: FATAL: Module aes_generic not found.
 					"blowfish"
 					"twofish"
 					"serpent"
@@ -140,6 +142,7 @@ let
 			[
 				"thinkpad_ec"
 				"tp_smapi"
+				# TODO: modprobe: FATAL: Module hid_lenovo_tpkbd not found.
 			];
 		};
 
@@ -414,7 +417,7 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0003:054C:05C4.*", MODE="0666"
 			createHome = true;
 			home = "/home/ltp";
 			group = "gltp";
-			extraGroups = [ "users" "wheel" ];
+			extraGroups = [ "users" "wheel" "audio" ];
 			shell = "/run/current-system/sw/bin/bash";
 		};
 
@@ -493,10 +496,11 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0003:054C:05C4.*", MODE="0666"
 	{
 		environment.systemPackages = with pkgs;
 		[
-			jack2Full
-			#qjackctl
+			#jack2Full
+			jack2
+			qjackctl
 
-			pulseaudioFull
+			# pulseaudioFull # Already default in hardware.pulseaudio.package.
 			alsaLib
 			alsaPlugins
 			alsaUtils
@@ -506,7 +510,7 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0003:054C:05C4.*", MODE="0666"
 			phonon_backend_gstreamer
 			pavucontrol
 
-			#sonic-pi
+			sonic-pi
 		];
 
 		sound.enable = true;
@@ -594,7 +598,7 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0003:054C:05C4.*", MODE="0666"
 				dosemu_fonts
 				eb-garamond
 				fira
-				fira-code
+				#fira-code
 				fira-mono
 				freefont_ttf
 				gentium
@@ -631,7 +635,7 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0003:054C:05C4.*", MODE="0666"
 				vistafonts
 				wqy_microhei
 				wqy_zenhei
-				google-fonts
+				#google-fonts
 				xorg.fontadobe100dpi
 				xorg.fontadobe75dpi
 				xorg.fontadobeutopia100dpi
@@ -997,7 +1001,7 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0003:054C:05C4.*", MODE="0666"
 		[
 			vlc
 			#mpv
-			ffmpeg-full
+			#ffmpeg-full # TODO: ERROR: librtmp not found using pkg-config
 		];
 
 		nixpkgs.config.mpv =
@@ -1024,6 +1028,7 @@ KERNEL=="hidraw*", SUBSYSTEM=="hidraw", KERNELS=="0003:054C:05C4.*", MODE="0666"
 			#PPSSPP
 			#dolphinEmuMaster
 			steam
+			# TODO:
 			/*
 			trying http://repo.steampowered.com/steamrt/pool/main/libx/libxrender/libxrender1_0.9.6-2ubuntu0.1+srt4_amd64.deb
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
